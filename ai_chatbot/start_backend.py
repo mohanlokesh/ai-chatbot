@@ -4,19 +4,11 @@ Script to start only the backend server
 
 import os
 import sys
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import importlib.util
 from dotenv import load_dotenv
-import time
-from datetime import datetime
 
-# Add parent directory to path to import modules
+# Add parent directory to path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from utils.auth import hash_password, check_password, generate_token, decode_token, token_required
-from database.models import User, Conversation, Message
-from models.chatbot import Chatbot
 from database.setup_db import setup_database
 
 if __name__ == "__main__":
@@ -30,10 +22,25 @@ if __name__ == "__main__":
     # Run backend
     print("Starting backend server...")
     
-    # Import and run the Flask app from backend
-    sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
-    from app import app
+    # Get the absolute path to the backend app.py
+    backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend")
+    backend_app_path = os.path.join(backend_dir, "app.py")
     
+    # Change to backend directory
+    os.chdir(backend_dir)
+    
+    # Add backend directory to path
+    sys.path.insert(0, backend_dir)
+    
+    # Import the Flask app using importlib to avoid naming conflicts
+    spec = importlib.util.spec_from_file_location("backend_app", backend_app_path)
+    backend_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(backend_module)
+    
+    # Get the Flask app instance
+    app = backend_module.app
+    
+    # Run the Flask app
     port = int(os.getenv("PORT", 5000))
     print(f"Backend server running on http://localhost:{port}")
     print("Press Ctrl+C to stop")
