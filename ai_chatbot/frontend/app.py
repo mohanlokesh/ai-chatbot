@@ -114,21 +114,33 @@ def login_page():
             if not username or not password:
                 st.error("Please enter username and password")
             else:
-                # Call login API
-                response = requests.post(
-                    f"{API_URL}/login",
-                    json={"username": username, "password": password}
-                )
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    st.session_state[TOKEN_KEY] = data["token"]
-                    st.session_state[USER_KEY] = data["user"]
-                    st.session_state['page'] = DASHBOARD_PAGE
-                    st.success("Login successful")
-                    st.rerun()
-                else:
-                    st.error(response.json().get("error", "Login failed"))
+                try:
+                    # Call login API
+                    response = requests.post(
+                        f"{API_URL}/login",
+                        json={"username": username, "password": password}
+                    )
+                    
+                    if response.status_code == 200:
+                        try:
+                            data = response.json()
+                            st.session_state[TOKEN_KEY] = data["token"]
+                            st.session_state[USER_KEY] = data["user"]
+                            st.session_state['page'] = DASHBOARD_PAGE
+                            st.success("Login successful")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error parsing response: {e}")
+                    else:
+                        try:
+                            error_msg = response.json().get("error", "Login failed")
+                            st.error(error_msg)
+                        except:
+                            st.error(f"Login failed with status code: {response.status_code}")
+                except requests.RequestException as e:
+                    st.error(f"Connection error: {e}. Is the backend server running?")
+                except Exception as e:
+                    st.error(f"Unexpected error: {e}")
 
 def register_page():
     """Register page"""
@@ -148,21 +160,33 @@ def register_page():
             elif password != confirm_password:
                 st.error("Passwords do not match")
             else:
-                # Call register API
-                response = requests.post(
-                    f"{API_URL}/register",
-                    json={"username": username, "email": email, "password": password}
-                )
-                
-                if response.status_code == 201:
-                    data = response.json()
-                    st.session_state[TOKEN_KEY] = data["token"]
-                    st.session_state[USER_KEY] = data["user"]
-                    st.session_state['page'] = DASHBOARD_PAGE
-                    st.success("Registration successful")
-                    st.rerun()
-                else:
-                    st.error(response.json().get("error", "Registration failed"))
+                try:
+                    # Call register API
+                    response = requests.post(
+                        f"{API_URL}/register",
+                        json={"username": username, "email": email, "password": password}
+                    )
+                    
+                    if response.status_code == 201:
+                        try:
+                            data = response.json()
+                            st.session_state[TOKEN_KEY] = data["token"]
+                            st.session_state[USER_KEY] = data["user"]
+                            st.session_state['page'] = DASHBOARD_PAGE
+                            st.success("Registration successful")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error parsing response: {e}")
+                    else:
+                        try:
+                            error_msg = response.json().get("error", "Registration failed")
+                            st.error(error_msg)
+                        except:
+                            st.error(f"Registration failed with status code: {response.status_code}")
+                except requests.RequestException as e:
+                    st.error(f"Connection error: {e}. Is the backend server running?")
+                except Exception as e:
+                    st.error(f"Unexpected error: {e}")
 
 def dashboard_page():
     """Dashboard page"""
@@ -303,16 +327,28 @@ def send_message(message):
         response = requests.post(
             f"{API_URL}/chat",
             json=data,
-            headers=headers
+            headers=headers,
+            timeout=10  # Add timeout
         )
         
         if response.status_code == 200:
-            return response.json()
+            try:
+                return response.json()
+            except Exception as e:
+                st.error(f"Error parsing response: {e}")
+                return None
         else:
-            st.error(f"Error: {response.json().get('error', 'Failed to send message')}")
+            try:
+                error_msg = response.json().get("error", "Failed to send message")
+                st.error(f"Error: {error_msg}")
+            except:
+                st.error(f"Failed to send message. Status code: {response.status_code}")
             return None
+    except requests.RequestException as e:
+        st.error(f"Connection error: {e}. Is the backend server running?")
+        return None
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Unexpected error: {e}")
         return None
 
 def get_conversations():
@@ -321,16 +357,28 @@ def get_conversations():
         headers = {"Authorization": f"Bearer {st.session_state[TOKEN_KEY]}"}
         response = requests.get(
             f"{API_URL}/conversations",
-            headers=headers
+            headers=headers,
+            timeout=10  # Add timeout
         )
         
         if response.status_code == 200:
-            return response.json()
+            try:
+                return response.json()
+            except Exception as e:
+                st.error(f"Error parsing response: {e}")
+                return []
         else:
-            st.error(f"Error: {response.json().get('error', 'Failed to get conversations')}")
+            try:
+                error_msg = response.json().get("error", "Failed to get conversations")
+                st.error(f"Error: {error_msg}")
+            except:
+                st.error(f"Failed to get conversations. Status code: {response.status_code}")
             return []
+    except requests.RequestException as e:
+        st.error(f"Connection error: {e}. Is the backend server running?")
+        return []
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Unexpected error: {e}")
         return []
 
 def fetch_conversation(conversation_id):
@@ -339,18 +387,30 @@ def fetch_conversation(conversation_id):
         headers = {"Authorization": f"Bearer {st.session_state[TOKEN_KEY]}"}
         response = requests.get(
             f"{API_URL}/conversations/{conversation_id}",
-            headers=headers
+            headers=headers,
+            timeout=10  # Add timeout
         )
         
         if response.status_code == 200:
-            data = response.json()
-            st.session_state[MESSAGES_KEY] = data["messages"]
-            return data
+            try:
+                data = response.json()
+                st.session_state[MESSAGES_KEY] = data["messages"]
+                return data
+            except Exception as e:
+                st.error(f"Error parsing response: {e}")
+                return None
         else:
-            st.error(f"Error: {response.json().get('error', 'Failed to fetch conversation')}")
+            try:
+                error_msg = response.json().get("error", "Failed to fetch conversation")
+                st.error(f"Error: {error_msg}")
+            except:
+                st.error(f"Failed to fetch conversation. Status code: {response.status_code}")
             return None
+    except requests.RequestException as e:
+        st.error(f"Connection error: {e}. Is the backend server running?")
+        return None
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Unexpected error: {e}")
         return None
 
 def end_conversation(conversation_id):
@@ -359,16 +419,24 @@ def end_conversation(conversation_id):
         headers = {"Authorization": f"Bearer {st.session_state[TOKEN_KEY]}"}
         response = requests.put(
             f"{API_URL}/conversations/{conversation_id}",
-            headers=headers
+            headers=headers,
+            timeout=10  # Add timeout
         )
         
         if response.status_code == 200:
             return True
         else:
-            st.error(f"Error: {response.json().get('error', 'Failed to end conversation')}")
+            try:
+                error_msg = response.json().get("error", "Failed to end conversation")
+                st.error(f"Error: {error_msg}")
+            except:
+                st.error(f"Failed to end conversation. Status code: {response.status_code}")
             return False
+    except requests.RequestException as e:
+        st.error(f"Connection error: {e}. Is the backend server running?")
+        return False
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Unexpected error: {e}")
         return False
 
 def format_datetime(dt_string):
