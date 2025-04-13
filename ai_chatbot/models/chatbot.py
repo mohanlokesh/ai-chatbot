@@ -7,7 +7,7 @@ import random
 
 # Add parent directory to path to import utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.nlp_utils import preprocess_text, extract_entities, find_best_matches
+from utils.nlp_utils import preprocess_text, extract_entities, find_best_matches, calculate_keyword_overlap
 from database.models import SupportData, Message, Conversation
 
 class Chatbot:
@@ -44,6 +44,10 @@ class Chatbot:
             "I'm not sure I understand. Can you ask in a different way?",
             "I don't have that information yet. Is there something else I can help with?"
         ]
+        
+        # Similarity thresholds
+        self.similarity_threshold = 0.25  # Lowered from 0.3 to catch more similar phrases
+        self.keyword_threshold = 0.5     # Threshold for keyword overlap
     
     def load_support_data(self):
         """Load support data from database"""
@@ -148,17 +152,33 @@ class Chatbot:
         matches = find_best_matches(query, questions, top_n=5)
         
         # Return best match if score is above threshold
-        if matches and matches[0][1] > 0.3:  # Adjust threshold as needed
+        if matches and matches[0][1] > self.similarity_threshold:
             best_match_index = questions.index(matches[0][0])
             return answers[best_match_index]
+        
+        # Try fallback to keyword matching if TF-IDF similarity is low
+        for question, score in matches:
+            # Calculate keyword overlap
+            overlap = calculate_keyword_overlap(query, question)
+            if overlap >= self.keyword_threshold:
+                best_match_index = questions.index(question)
+                return answers[best_match_index]
         
         # Extract entities for more specific matching
         entities = extract_entities(query)
         
-        # If we found entities, try to match them
-        if any(entities.values()):
-            # TODO: Implement more sophisticated entity-based matching
-            pass
+        # If we found action entities, use them for matching
+        if entities['action']:
+            # Find questions that have a similar action
+            possible_matches = []
+            for action in entities['action']:
+                for i, question in enumerate(questions):
+                    if action.lower() in preprocess_text(question).lower():
+                        possible_matches.append((question, i))
+            
+            # If we found matches, return the first one
+            if possible_matches:
+                return answers[possible_matches[0][1]]
         
         # Return fallback if no good match
         return self.get_fallback()

@@ -20,12 +20,18 @@ except LookupError:
 # Initialize lemmatizer
 lemmatizer = WordNetLemmatizer()
 
+# Define question words and filler words to handle question variations
+QUESTION_WORDS = ['how', 'what', 'where', 'when', 'who', 'why', 'can', 'do', 'is', 'are', 'will', 'should']
+FILLER_WORDS = ['i', 'me', 'my', 'mine', 'you', 'your', 'yours', 'please', 'kindly', 'want', 'need', 'would', 'like', 'get', 'tell']
+IGNORE_WORDS = ['a', 'an', 'the', 'this', 'that', 'these', 'those', 'to', 'for', 'in', 'on', 'with', 'by', 'at', 'and', 'or', 'but']
+
 def preprocess_text(text):
     """
     Preprocess text for NLP:
     - Convert to lowercase
     - Remove punctuation
-    - Remove stopwords
+    - Remove question words (to focus on keywords)
+    - Remove common filler words
     - Lemmatize words
     """
     # Convert to lowercase
@@ -37,14 +43,24 @@ def preprocess_text(text):
     # Tokenize
     tokens = word_tokenize(text)
     
-    # Remove stopwords
+    # Remove stopwords, question words, and filler words
     stop_words = set(stopwords.words('english'))
-    tokens = [token for token in tokens if token not in stop_words]
+    tokens = [token for token in tokens if token not in stop_words and 
+              token not in QUESTION_WORDS and 
+              token not in FILLER_WORDS and
+              token not in IGNORE_WORDS]
     
     # Lemmatize
     tokens = [lemmatizer.lemmatize(token) for token in tokens]
     
-    return ' '.join(tokens)
+    # Handle common substitutions (e.g., 'promocode' vs 'promo code')
+    processed_text = ' '.join(tokens)
+    processed_text = processed_text.replace('promocode', 'promo code')
+    processed_text = processed_text.replace('discount code', 'promo code')
+    processed_text = processed_text.replace('coupon', 'promo code')
+    processed_text = processed_text.replace('voucher', 'promo code')
+    
+    return processed_text
 
 def extract_entities(text):
     """Extract entities from text (basic implementation)"""
@@ -52,7 +68,8 @@ def extract_entities(text):
         'company': [],
         'product': [],
         'issue': [],
-        'contact': []
+        'contact': [],
+        'action': []
     }
     
     # Simple pattern matching for companies (very basic)
@@ -79,6 +96,12 @@ def extract_entities(text):
     if re.search(contact_pattern, text.lower()):
         entities['contact'].append('contact_request')
     
+    # Detect action words (common verbs in questions)
+    action_pattern = r'(find|get|use|apply|track|return|reset|change|cancel|pay)'
+    if re.search(action_pattern, text.lower()):
+        matches = re.findall(action_pattern, text.lower())
+        entities['action'].extend(matches)
+    
     return entities
 
 def find_best_matches(query, documents, top_n=5):
@@ -92,8 +115,13 @@ def find_best_matches(query, documents, top_n=5):
     # Preprocess all text
     preprocessed_text = [preprocess_text(text) for text in all_text]
     
-    # Create TF-IDF vectorizer
-    vectorizer = TfidfVectorizer()
+    # Create TF-IDF vectorizer with bi-grams and character n-grams
+    # This helps catch variations in phrasing
+    vectorizer = TfidfVectorizer(
+        analyzer='word',
+        ngram_range=(1, 2),      # Use both unigrams and bigrams
+        sublinear_tf=True        # Apply sublinear tf scaling (logarithmic)
+    )
     tfidf_matrix = vectorizer.fit_transform(preprocessed_text)
     
     # Get query vector (first in the matrix)
@@ -111,4 +139,24 @@ def find_best_matches(query, documents, top_n=5):
     # Return top matches with scores
     top_matches = [(documents[i], cosine_similarities[i]) for i in top_indices]
     
-    return top_matches 
+    return top_matches
+
+def calculate_keyword_overlap(query, document):
+    """
+    Calculate the percentage of keywords that overlap between query and document
+    This can be used as a fallback when TF-IDF similarity is low
+    """
+    # Preprocess both texts
+    processed_query = preprocess_text(query)
+    processed_doc = preprocess_text(document)
+    
+    # Convert to sets of words
+    query_words = set(processed_query.split())
+    doc_words = set(processed_doc.split())
+    
+    # Calculate overlap
+    if not query_words:
+        return 0
+    
+    overlap = len(query_words.intersection(doc_words)) / len(query_words)
+    return overlap 
