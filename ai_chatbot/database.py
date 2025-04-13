@@ -7,10 +7,16 @@ Handles storage and retrieval of FAQ data, conversation history, and embeddings.
 import sqlite3
 import json
 import logging
+import os
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 
-from ai_chatbot.config import DB_FILE, DB_SCHEMA_VERSION
+# Instead of importing from ai_chatbot, define DB_FILE and DB_SCHEMA_VERSION locally
+# from ai_chatbot.config import DB_FILE, DB_SCHEMA_VERSION
+DB_SCHEMA_VERSION = "1.0"
+# Get current directory
+current_dir = os.path.dirname(os.path.abspath(__file__))
+DB_FILE = os.path.join(current_dir, "database", "chatbot.db")
 
 logger = logging.getLogger(__name__)
 
