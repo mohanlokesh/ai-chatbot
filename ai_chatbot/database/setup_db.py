@@ -12,15 +12,23 @@ from database.models import Base, User, Conversation, Message, Company, SupportD
 # Load environment variables
 load_dotenv()
 
+# Get the absolute project root path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Database URL (default to SQLite for development)
-DB_URL = os.getenv("DATABASE_URL", "sqlite:///database/chatbot.db")
+# Use absolute path for the SQLite database file
+DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL or DB_URL.startswith("sqlite:///"):
+    DB_PATH = os.path.join(PROJECT_ROOT, "database", "chatbot.db")
+    DB_URL = f"sqlite:///{DB_PATH}"
+    os.environ["DATABASE_URL"] = DB_URL
 
 def setup_database():
     """Create database and tables"""
     print("Setting up database...")
     
     # Create SQLite file directory if not exists
-    if DB_URL.startswith("sqlite"):
+    if DB_URL.startswith("sqlite:///"):
         db_path = DB_URL.replace("sqlite:///", "")
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
     

@@ -17,12 +17,22 @@ from models.chatbot import Chatbot
 # Load environment variables
 load_dotenv()
 
+# Get the absolute project root path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Database URL (default to SQLite for development)
+# Use absolute path for the SQLite database file
+DB_URL = os.getenv("DATABASE_URL")
+if not DB_URL or DB_URL.startswith("sqlite:///"):
+    DB_PATH = os.path.join(PROJECT_ROOT, "database", "chatbot.db")
+    DB_URL = f"sqlite:///{DB_PATH}"
+    os.environ["DATABASE_URL"] = DB_URL
+
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS
 
 # Database setup
-DB_URL = os.getenv("DATABASE_URL", "sqlite:///database/chatbot.db")
 engine = create_engine(DB_URL)
 Session = sessionmaker(bind=engine)
 

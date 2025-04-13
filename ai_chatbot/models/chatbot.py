@@ -15,7 +15,17 @@ class Chatbot:
     
     def __init__(self, db_url=None):
         """Initialize chatbot with database connection"""
-        self.db_url = db_url or os.getenv("DATABASE_URL", "sqlite:///database/chatbot.db")
+        if not db_url:
+            # Get the absolute project root path
+            PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
+            # Use absolute path for the SQLite database file
+            db_url = os.getenv("DATABASE_URL")
+            if not db_url or db_url.startswith("sqlite:///"):
+                DB_PATH = os.path.join(PROJECT_ROOT, "database", "chatbot.db")
+                db_url = f"sqlite:///{DB_PATH}"
+        
+        self.db_url = db_url
         self.engine = create_engine(self.db_url)
         self.Session = sessionmaker(bind=self.engine)
         
