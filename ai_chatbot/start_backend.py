@@ -44,4 +44,5 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     print(f"Backend server running on http://localhost:{port}")
     print("Press Ctrl+C to stop")
-    app.run(host='0.0.0.0', port=port, debug=True) 
+    # Disable debug mode to prevent auto-reloading issues
+    app.run(host='0.0.0.0', port=port, debug=False) 
