@@ -43,14 +43,26 @@ def run_frontend():
         print(f"Error starting frontend server: {e}")
         print("Make sure you have installed all dependencies with 'pip install -r requirements.txt'")
 
+def run_rasa():
+    """Run the Rasa server"""
+    try:
+        # Use subprocess to run the Rasa script
+        subprocess.run(["python", "start_rasa.py"])
+    except Exception as e:
+        print(f"Error starting Rasa server: {e}")
+        print("Make sure you have installed Rasa with 'pip install rasa'")
+
 def main():
     """Main entry point for the application"""
     parser = argparse.ArgumentParser(description="Run the AI Chatbot application")
     parser.add_argument("--backend-only", action="store_true", help="Run only the backend server")
     parser.add_argument("--frontend-only", action="store_true", help="Run only the frontend server")
+    parser.add_argument("--rasa-only", action="store_true", help="Run only the Rasa server")
+    parser.add_argument("--no-rasa", action="store_true", help="Don't run the Rasa server")
     parser.add_argument("--no-setup", action="store_true", help="Skip database setup")
     parser.add_argument("--port", type=int, default=5000, help="Port for the backend server")
     parser.add_argument("--frontend-port", type=int, default=8501, help="Port for the Streamlit frontend")
+    parser.add_argument("--rasa-port", type=int, default=5005, help="Port for the Rasa server")
     
     args = parser.parse_args()
     
@@ -58,18 +70,23 @@ def main():
     load_dotenv()
     
     # Check if ports are already in use
-    if not args.frontend_only and check_port_in_use(args.port):
+    if not args.frontend_only and not args.rasa_only and check_port_in_use(args.port):
         print(f"Warning: Port {args.port} is already in use. Backend may not start correctly.")
         print(f"Try using a different port with: python app.py --port {args.port + 1}")
     
-    if not args.backend_only and check_port_in_use(args.frontend_port):
+    if not args.backend_only and not args.rasa_only and check_port_in_use(args.frontend_port):
         print(f"Warning: Port {args.frontend_port} is already in use. Frontend may not start correctly.")
         print(f"Try using a different port with: python app.py --frontend-port {args.frontend_port + 1}")
+    
+    if not args.frontend_only and not args.backend_only and not args.no_rasa and check_port_in_use(args.rasa_port):
+        print(f"Warning: Port {args.rasa_port} is already in use. Rasa may not start correctly.")
+        print(f"Try using a different port with: python app.py --rasa-port {args.rasa_port + 1}")
     
     # Set environment variables for ports
     os.environ["PORT"] = str(args.port)
     os.environ["STREAMLIT_SERVER_PORT"] = str(args.frontend_port)
     os.environ["API_URL"] = f"http://localhost:{args.port}/api"
+    os.environ["RASA_URL"] = f"http://localhost:{args.rasa_port}"
     
     # Setup database if not skipped
     if not args.no_setup:
@@ -81,8 +98,9 @@ def main():
             print("Continuing with application startup...")
     
     # Determine what to run
-    run_backend_server = not args.frontend_only
-    run_frontend_server = not args.backend_only
+    run_backend_server = not args.frontend_only and not args.rasa_only
+    run_frontend_server = not args.backend_only and not args.rasa_only
+    run_rasa_server = not args.frontend_only and not args.backend_only and not args.no_rasa
     
     # Print startup instructions
     print("\n============== AI CHATBOT SYSTEM ==============")
@@ -92,6 +110,25 @@ def main():
     print("Username: admin")
     print("Password: password123")
     print("==============================================\n")
+    
+    # Start the Rasa server in a separate thread if needed
+    if run_rasa_server or args.rasa_only:
+        rasa_thread = threading.Thread(target=run_rasa)
+        rasa_thread.daemon = True
+        rasa_thread.start()
+        print(f"Rasa server starting on http://localhost:{args.rasa_port}")
+        
+        # Wait a bit for Rasa to start
+        time.sleep(5)
+        
+        if args.rasa_only:
+            print("Press Ctrl+C to stop the Rasa server")
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("Shutting down Rasa server...")
+                return
     
     # Start the backend server in a separate thread if needed
     if run_backend_server:

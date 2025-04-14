@@ -12,7 +12,7 @@ from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.auth import hash_password, check_password, generate_token, decode_token, token_required
 from database.models import User, Conversation, Message
-from models.chatbot import Chatbot
+from models.rasa_chatbot import RasaChatbot
 
 # Load environment variables
 load_dotenv()
@@ -37,7 +37,7 @@ engine = create_engine(DB_URL)
 Session = sessionmaker(bind=engine)
 
 # Initialize chatbot
-chatbot = Chatbot(DB_URL)
+chatbot = RasaChatbot(DB_URL)
 
 @app.route('/api/register', methods=['POST'])
 def register():

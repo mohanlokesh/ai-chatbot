@@ -1,0 +1,63 @@
+version: "3.1"
+
+rules:
+
+- rule: Say hello whenever the user greets
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Say goodbye when the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Thank user when they thank us
+  steps:
+  - intent: thank
+  - action: utter_thank
+
+- rule: Out-of-scope fallback
+  steps:
+  - intent: out_of_scope
+  - action: utter_fallback
+
+- rule: Dynamic FAQ lookup for product info
+  steps:
+  - intent: ask_product_info
+  - action: action_search_faq
+
+- rule: Dynamic FAQ lookup for discounts
+  steps:
+  - intent: ask_discount
+  - action: action_search_faq
+
+- rule: Dynamic FAQ lookup for account help
+  steps:
+  - intent: ask_account_help
+  - action: action_search_faq
+
+- rule: Dynamic FAQ lookup for technical help
+  steps:
+  - intent: ask_technical_help
+  - action: action_search_faq
+
+- rule: Save conversation on greeting
+  steps:
+  - intent: greet
+  - action: action_save_conversation
+
+- rule: Respond to shipping info question
+  steps:
+  - intent: ask_shipping_info
+  - action: utter_ask_shipping_info
+
+- rule: Respond to return policy question
+  steps:
+  - intent: ask_return_policy
+  - action: utter_ask_return_policy
+
+- rule: Respond to payment methods question
+  steps:
+  - intent: ask_payment_methods
+  - action: utter_ask_payment_methods 

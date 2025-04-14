@@ -1,0 +1,87 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - thank
+  - ask_order_status
+  - ask_shipping_info
+  - ask_return_policy
+  - ask_payment_methods
+  - ask_product_info
+  - ask_discount
+  - ask_account_help
+  - ask_technical_help
+  - out_of_scope
+
+entities:
+  - order_number
+  - product_name
+  - company_name
+  - date
+  - amount
+  - email
+
+slots:
+  order_number:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: order_number
+  product_name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: product_name
+  company_name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: company_name
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I help you today?"
+    - text: "Hi there! What can I assist you with?"
+    - text: "Welcome! How may I help you?"
+    - text: "Greetings! What do you need help with today?"
+
+  utter_goodbye:
+    - text: "Goodbye! Have a nice day!"
+    - text: "Thanks for chatting with us. Goodbye!"
+    - text: "Bye! Feel free to come back if you have more questions."
+
+  utter_thank:
+    - text: "You're welcome!"
+    - text: "Happy to help!"
+    - text: "No problem at all!"
+
+  utter_fallback:
+    - text: "I'm sorry, I don't have information about that topic. I can help with questions about orders, shipping, returns, and using our website."
+    - text: "I don't have enough information to answer that. I specialize in customer support for our online store. Is there something about your order I can help with?"
+    - text: "That's outside my area of expertise. I can assist with orders, returns, shipping, and account questions. How can I help you with one of those?"
+
+  utter_default:
+    - text: "I'm not sure I understand. Can you rephrase your question?"
+
+  utter_ask_order_status_prompt:
+    - text: "I'd be happy to check your order status. What's your order number?"
+
+  utter_ask_shipping_info:
+    - text: "Standard shipping takes 3-5 business days. Express shipping takes 1-2 business days. International shipping may take 7-14 business days."
+
+  utter_ask_return_policy:
+    - text: "Our return policy allows returns within 30 days of purchase. Items must be unused with original packaging. You can start a return from your account page or by contacting customer support."
+
+  utter_ask_payment_methods:
+    - text: "We accept credit cards (Visa, MasterCard, American Express), PayPal, and Apple Pay."
+
+actions:
+  - action_search_faq
+  - action_save_conversation
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true 

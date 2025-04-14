@@ -1,0 +1,38 @@
+version: "3.1"
+
+stories:
+
+- story: greet and ask order status
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_order_status
+  - action: utter_ask_order_status_prompt
+
+- story: greet and ask shipping info
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_shipping_info
+  - action: utter_ask_shipping_info
+  - intent: thank
+  - action: utter_thank
+
+- story: ask return policy
+  steps:
+  - intent: ask_return_policy
+  - action: utter_ask_return_policy
+  - intent: thank
+  - action: utter_thank
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: ask payment methods
+  steps:
+  - intent: ask_payment_methods
+  - action: utter_ask_payment_methods
+
+- story: out of scope
+  steps:
+  - intent: out_of_scope
+  - action: utter_fallback 

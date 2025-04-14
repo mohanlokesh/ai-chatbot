@@ -1,0 +1,177 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - hey there
+    - greetings
+    - howdy
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you around
+    - see you later
+    - have a nice day
+    - catch you later
+    - bye bye
+    - have a good day
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+    - sure
+    - ok
+    - yeah
+    - sounds good
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+    - nope
+    - not at all
+
+- intent: thank
+  examples: |
+    - thanks
+    - thank you
+    - thanks a lot
+    - thank you very much
+    - I appreciate it
+    - thanks for your help
+    - much appreciated
+
+- intent: ask_order_status
+  examples: |
+    - Where is my order?
+    - I want to know the status of my order
+    - Can you tell me where my package is?
+    - Is my order [12345](order_number) shipped yet?
+    - Has order [ABC-123](order_number) been delivered?
+    - Track my package
+    - Track order [XYZ789](order_number)
+    - When will my order arrive?
+    - Delivery status for [98765](order_number)
+    - Has my order shipped?
+
+- intent: ask_shipping_info
+  examples: |
+    - How long does shipping take?
+    - What are your shipping options?
+    - How much is express shipping?
+    - Do you ship internationally?
+    - What shipping carriers do you use?
+    - How can I get free shipping?
+    - Shipping to [Canada](company_name)
+    - What's the fastest shipping method?
+    - Do you offer same-day delivery?
+    - How much does shipping cost?
+
+- intent: ask_return_policy
+  examples: |
+    - What is your return policy?
+    - How do I return an item?
+    - Can I get a refund?
+    - How long do I have to return?
+    - Do I need the original packaging to return?
+    - Is return shipping free?
+    - How do I start a return?
+    - Can I exchange instead of return?
+    - Return policy for damaged items
+    - How long for refund after return?
+
+- intent: ask_payment_methods
+  examples: |
+    - What payment methods do you accept?
+    - Can I pay with PayPal?
+    - Do you accept credit cards?
+    - Can I pay with Apple Pay?
+    - Do you offer buy now pay later?
+    - Can I use a gift card?
+    - Do you accept international credit cards?
+    - Can I split payment between cards?
+    - Do you accept [Visa](company_name)?
+    - Payment options available
+
+- intent: ask_product_info
+  examples: |
+    - Tell me about [iPhone 15](product_name)
+    - What are the specifications of [Samsung TV](product_name)?
+    - Is [Airpods Pro](product_name) in stock?
+    - When will [PlayStation 5](product_name) be available?
+    - What colors does the [Nike Air Max](product_name) come in?
+    - Does [iPad Pro](product_name) come with a charger?
+    - How much is [Microsoft Surface](product_name)?
+    - Features of [Canon camera](product_name)
+    - Compare [MacBook Air](product_name) and [MacBook Pro](product_name)
+    - Is [Dyson vacuum](product_name) worth it?
+
+- intent: ask_discount
+  examples: |
+    - Are there any active promotions?
+    - Do you have any discount codes?
+    - How do I use a promo code?
+    - Are there student discounts?
+    - When is your next sale?
+    - Do you price match?
+    - Any buy one get one free deals?
+    - Do you offer military discounts?
+    - Is there a first-time customer discount?
+    - How do I get free shipping?
+
+- intent: ask_account_help
+  examples: |
+    - How do I create an account?
+    - I forgot my password
+    - Can't login to my account
+    - How do I update my email?
+    - Change my shipping address
+    - Update payment information
+    - Delete my account
+    - How to see my order history?
+    - Link my social media account
+    - Add a new shipping address
+
+- intent: ask_technical_help
+  examples: |
+    - Website is not loading
+    - Can't add items to cart
+    - Payment is not going through
+    - Images not loading on your site
+    - Error during checkout
+    - Mobile app keeps crashing
+    - Forgot to use my discount code
+    - Website shows products out of stock
+    - Problems with your search function
+    - Can't complete my purchase
+
+- intent: out_of_scope
+  examples: |
+    - What's the weather like?
+    - Tell me a joke
+    - Who is the president?
+    - Can you help me with my homework?
+    - What's the meaning of life?
+    - Do you know any good recipes?
+    - What movies are playing?
+    - Tell me about your family
+    - Can you recommend a restaurant?
+    - What's the capital of France? 
