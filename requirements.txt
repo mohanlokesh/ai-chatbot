@@ -15,7 +15,7 @@ torch==2.0.1
 transformers==4.41.0
 sentence-transformers==4.0.2
 scipy>=1.7.0
-rasa==3.7.0b2
-rasa-sdk==3.7.0b2
+rasa==3.6.21
+rasa-sdk==3.6.21
 psycopg2-binary==2.9.9
 alembic==1.13.1 
