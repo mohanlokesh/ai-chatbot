@@ -78,6 +78,7 @@ nlu:
 - intent: ask_discounts
   examples: |
     - How do I use a promo code?
+    - i need help with promo code
     - I need to use a promocode how to do that
     - How to apply a promotional code?
     - where do I enter promo code
@@ -87,7 +88,6 @@ nlu:
     - I want to apply a discount code
     - what's the process for using promo codes
     - got a promo code where to enter
-    - i need help with promo code
     - I can't find where to enter my promocode
 
 - intent: ask_pricing
