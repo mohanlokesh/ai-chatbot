@@ -1,29 +1,49 @@
 """
-Utility functions using sentence-transformers for better semantic understanding
+Utility functions using transformers for better semantic understanding
 """
 
 import os
 import torch
-from sentence_transformers import SentenceTransformer, util
+import numpy as np
+from transformers import AutoTokenizer, AutoModel
+import scipy.spatial
 
 # Global model instance
 _model = None
+_tokenizer = None
 
-def get_model():
-    """Get or initialize the sentence transformer model"""
-    global _model
-    if _model is None:
+def get_model_and_tokenizer():
+    """Get or initialize the transformer model and tokenizer"""
+    global _model, _tokenizer
+    if _model is None or _tokenizer is None:
         # Use all-MiniLM-L6-v2 - a small, fast model with good performance
-        model_name = "all-MiniLM-L6-v2"
-        print(f"Loading sentence transformer model: {model_name}")
-        _model = SentenceTransformer(model_name)
-    return _model
+        model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        print(f"Loading transformer model: {model_name}")
+        _tokenizer = AutoTokenizer.from_pretrained(model_name)
+        _model = AutoModel.from_pretrained(model_name)
+    return _model, _tokenizer
+
+def mean_pooling(model_output, attention_mask):
+    """Perform mean pooling on token embeddings"""
+    token_embeddings = model_output[0]  # First element of model_output contains all token embeddings
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
 def encode_sentences(sentences):
     """Encode sentences to embeddings"""
-    model = get_model()
-    embeddings = model.encode(sentences, convert_to_tensor=True)
-    return embeddings
+    model, tokenizer = get_model_and_tokenizer()
+    
+    # Tokenize sentences
+    encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+    
+    # Compute token embeddings
+    with torch.no_grad():
+        model_output = model(**encoded_input)
+    
+    # Perform mean pooling
+    sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+    
+    return sentence_embeddings
 
 def find_semantic_matches(query, candidates, top_k=5, threshold=0.5):
     """
@@ -54,26 +74,24 @@ def find_semantic_matches(query, candidates, top_k=5, threshold=0.5):
     embeddings = encode_sentences(all_sentences)
     
     # Get query embedding and candidate embeddings
-    query_embedding = embeddings[0]
-    candidate_embeddings = embeddings[1:]
+    query_embedding = embeddings[0].numpy()
+    candidate_embeddings = embeddings[1:].numpy()
     
     # Calculate cosine similarities
-    cos_scores = util.cos_sim(query_embedding, candidate_embeddings)[0]
+    similarities = []
+    for i, candidate_embedding in enumerate(candidate_embeddings):
+        similarity = 1 - scipy.spatial.distance.cosine(query_embedding, candidate_embedding)
+        similarities.append((i, similarity))
     
-    # Get top-k matches
+    # Sort by similarity (descending)
+    similarities.sort(key=lambda x: x[1], reverse=True)
+    
+    # Get top-k matches above threshold
     top_results = []
-    for i in range(min(top_k, len(candidates))):
-        if i < len(cos_scores):
-            index = cos_scores.argmax()
-            score = cos_scores[index].item()
-            
-            # Only include matches above threshold
-            if score >= threshold:
-                top_results.append((candidates[index], score))
-            
-            # Set this score to -1 so it's not selected again
-            cos_scores[index] = -1
-            
+    for idx, score in similarities[:top_k]:
+        if score >= threshold:
+            top_results.append((candidates[idx], score))
+    
     return top_results
 
 def calculate_max_similarity(query, candidates):

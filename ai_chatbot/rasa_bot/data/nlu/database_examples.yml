@@ -1,0 +1,211 @@
+version: "3.1"
+
+nlu:
+- intent: ask_account
+  examples: |
+    - How do I reset my password?
+    - Can I change the email address on my account?
+    - I forgot my password. How do I reset it?
+    - password reset help
+    - i can't login to my account
+    - Why can't I upgrade my device?
+    - Do you support customize for order?
+
+- intent: ask_payments
+  examples: |
+    - What payment methods do you accept?
+    - can i pay with paypal
+    - do you accept apple pay
+    - what cards do you take
+    - What is the best way to renew settings?
+    - Why can't I customize my profile?
+    - Do you support configure for account?
+    - Why can't I setup my computer?
+    - How do I transfer my notification settings?
+
+- intent: ask_support
+  examples: |
+    - How do I contact customer support?
+    - How can I check the status of my support ticket?
+
+- intent: ask_shipping
+  examples: |
+    - How do I track my order?
+    - Do you offer international shipping?
+    - where is my order
+    - i want to check on my package status
+    - how to see where my order is
+    - ship to europe?
+    - do you ship worldwide
+    - Do you support update for smartphone?
+    - Is it possible to backup my warranty claim?
+    - How do I upgrade my return request?
+
+- intent: ask_returns
+  examples: |
+    - What is your return policy?
+    - how do i return something
+    - can i get a refund
+    - How do I verify my shipping address?
+    - I need help with manage my account. What should I do?
+    - How do I cancel my delivery?
+    - What are the steps to uninstall a two-factor authentication?
+    - When should I reset my notification settings?
+    - What are the steps to verify a email?
+    - Why can't I cancel my payment method?
+    - When should I recover my membership?
+
+- intent: ask_orders
+  examples: |
+    - How can I change or cancel my order?
+    - What is the best way to cancel subscription?
+
+- intent: ask_security
+  examples: |
+    - Is my personal information secure?
+    - How secure is your website?
+    - When should I customize my account?
+    - Can you explain how to configure notification settings?
+    - Can you explain how to deactivate password?
+    - I need help with deactivate my computer. What should I do?
+    - Do you support track for purchase?
+    - When should I manage my computer?
+
+- intent: ask_services
+  examples: |
+    - Do you offer gift wrapping?
+
+- intent: ask_discounts
+  examples: |
+    - How do I use a promo code?
+    - I need to use a promocode how to do that
+    - How to apply a promotional code?
+    - where do I enter promo code
+    - how to redeem a coupon
+    - i have a promo code where do i put it
+    - can you tell me how to use promocode
+    - I want to apply a discount code
+    - what's the process for using promo codes
+    - got a promo code where to enter
+    - i need help with promo code
+    - I can't find where to enter my promocode
+
+- intent: ask_pricing
+  examples: |
+    - What is your price match policy?
+
+- intent: ask_rewards
+  examples: |
+    - Do you have a loyalty program?
+
+- intent: ask_contact
+  examples: |
+    - How do I speak to a customer service representative?
+    - What is your response time for email inquiries?
+    - What are your customer service hours?
+
+- intent: ask_complaints
+  examples: |
+    - How do I submit a complaint?
+
+- intent: ask_communication
+  examples: |
+    - How do I unsubscribe from your emails?
+
+- intent: ask_policies
+  examples: |
+    - Do you have a satisfaction guarantee?
+
+- intent: ask_feedback
+  examples: |
+    - How can I provide feedback about your service?
+
+- intent: ask_technical
+  examples: |
+    - How do I clear my browser cache?
+    - Why is your website loading slowly for me?
+    - The images aren't loading on your website. What should I do?
+    - How do I enable JavaScript in my browser?
+    - What are the system requirements for your web application?
+    - How do I update my browser?
+    - Can I use your website on my mobile device?
+    - Why am I getting a 404 error?
+    - What should I do if I encounter a bug on your website?
+    - What are the steps to renew a settings?
+
+- intent: ask_warranty
+  examples: |
+    - What is the warranty period for your products?
+
+- intent: ask_environmental
+  examples: |
+    - Are your products eco-friendly?
+
+- intent: ask_inventory
+  examples: |
+    - How do I know if a product is in stock?
+
+- intent: ask_customization
+  examples: |
+    - Do you offer product customization?
+
+- intent: ask_specifications
+  examples: |
+    - How do I find product dimensions?
+
+- intent: ask_documentation
+  examples: |
+    - Are instruction manuals available online?
+
+- intent: ask_compatibility
+  examples: |
+    - How do I know if a product is compatible with my device?
+
+- intent: ask_parts
+  examples: |
+    - Do you sell replacement parts?
+
+- intent: ask_products
+  examples: |
+    - How often do you release new products?
+
+- intent: ask_safety
+  examples: |
+    - Are your products tested for safety?
+
+- intent: ask_general
+  examples: |
+    - I need help with track my password. What should I do?
+    - Why can't I downgrade my computer?
+    - Can you explain how to renew two-factor authentication?
+    - Do you support backup for purchase?
+    - Why can't I uninstall my preferences?
+    - I need help with deactivate my privacy settings. What should I do?
+    - I need help with renew my shipping address. What should I do?
+    - When should I verify my email?
+
+- intent: ask_billing
+  examples: |
+    - Where can I find information about sync email?
+    - What are the steps to reset a notification settings?
+    - How do I track my return request?
+    - How do I configure my password?
+    - I need help with restore my login credentials. What should I do?
+    - I need help with update my settings. What should I do?
+    - Where can I find information about manage return request?
+
+- intent: ask_setup
+  examples: |
+    - When should I sync my order?
+    - Is it possible to manage my email?
+    - Is it possible to update my device?
+    - What is the best way to track payment method?
+
+- intent: ask_troubleshooting
+  examples: |
+    - Why can't I downgrade my account?
+    - When should I downgrade my warranty claim?
+    - Can you explain how to setup email?
+    - Is it possible to activate my privacy settings?
+    - When should I verify my delivery?
+

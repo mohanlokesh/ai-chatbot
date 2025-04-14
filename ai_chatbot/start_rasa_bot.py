@@ -12,6 +12,24 @@ from dotenv import load_dotenv
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from utils.rasa_integration import RasaIntegration
 
+def init_dependencies():
+    """Initialize dependencies like transformers before starting Rasa"""
+    try:
+        print("Initializing transformer models...")
+        from transformers import AutoTokenizer, AutoModel
+        
+        # Pre-download the model to prevent issues during runtime
+        model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModel.from_pretrained(model_name)
+        
+        print("Model loaded successfully!")
+        return True
+    except Exception as e:
+        print(f"Error initializing dependencies: {e}")
+        print("Make sure transformers is installed with 'pip install transformers'")
+        return False
+
 def main():
     """Main entry point for the Rasa bot startup"""
     parser = argparse.ArgumentParser(description="Start the Rasa chatbot")
@@ -23,6 +41,11 @@ def main():
     
     # Load environment variables
     load_dotenv()
+    
+    # Initialize dependencies first
+    if not init_dependencies():
+        print("Failed to initialize required dependencies. Exiting.")
+        return
     
     # Initialize Rasa integration
     rasa_integration = RasaIntegration()
