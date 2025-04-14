@@ -11,10 +11,17 @@ from utils.nlp_utils import preprocess_text, extract_entities, find_best_matches
 from utils.transformer_utils import semantic_faqs_search, find_semantic_matches
 from database.models import SupportData, Message, Conversation
 
+# Import Rasa integration if available
+try:
+    from utils.rasa_integration import RasaIntegration
+    RASA_AVAILABLE = True
+except ImportError:
+    RASA_AVAILABLE = False
+
 class Chatbot:
-    """Chatbot implementation with transformer-based semantic search capabilities"""
+    """Chatbot implementation with transformer-based semantic search and Rasa NLP capabilities"""
     
-    def __init__(self, db_url=None):
+    def __init__(self, db_url=None, use_rasa=True):
         """Initialize chatbot with database connection"""
         if not db_url:
             # Get the absolute project root path
@@ -62,7 +69,22 @@ class Chatbot:
             "password", "checkout", "product", "price", "store"
         ]
         
-        print("Chatbot initialized with transformer-based semantic search capability")
+        # Initialize Rasa integration if available and requested
+        self.use_rasa = use_rasa and RASA_AVAILABLE
+        self.rasa_integration = None
+        
+        if self.use_rasa:
+            try:
+                self.rasa_integration = RasaIntegration(db_url=db_url)
+                print("Initialized with Rasa NLP capability")
+            except Exception as e:
+                print(f"Failed to initialize Rasa integration: {e}")
+                self.use_rasa = False
+        
+        if self.use_rasa:
+            print("Chatbot initialized with Rasa NLP capability")
+        else:
+            print("Chatbot initialized with transformer-based semantic search capability")
     
     def load_support_data(self, use_cache=True):
         """Load support data from database"""
@@ -120,6 +142,17 @@ class Chatbot:
         Returns:
             dict: Response with text and metadata
         """
+        # If Rasa is available and enabled, use it for processing
+        if self.use_rasa and self.rasa_integration:
+            try:
+                # Use Rasa for NLP processing
+                return self.rasa_integration.process_message(message_text, user_id, conversation_id)
+            except Exception as e:
+                print(f"Error using Rasa for processing: {e}")
+                print("Falling back to transformer-based processing")
+                # Fall back to our own processing if Rasa fails
+        
+        # Otherwise use our built-in transformer-based processing
         session = self.Session()
         try:
             # Create new conversation if needed
@@ -200,53 +233,35 @@ class Chatbot:
             best_match_index = questions.index(matches[0][0])
             return answers[best_match_index]
         
-        # Try fallback to keyword matching if TF-IDF similarity is low
-        for question, score in matches:
-            # Calculate keyword overlap
-            overlap = calculate_keyword_overlap(query, question)
-            if overlap >= self.keyword_threshold:
-                best_match_index = questions.index(question)
-                return answers[best_match_index]
+        # If no good TF-IDF matches, try keyword overlap
+        for i, question in enumerate(questions):
+            overlap_score = calculate_keyword_overlap(query, question)
+            if overlap_score > self.keyword_threshold:
+                return answers[i]
         
-        # Extract entities for more specific matching
-        entities = extract_entities(query)
-        
-        # If we found action entities, use them for matching
-        if entities['action']:
-            # Find questions that have a similar action
-            possible_matches = []
-            for action in entities['action']:
-                for i, question in enumerate(questions):
-                    if action.lower() in preprocess_text(question).lower():
-                        possible_matches.append((question, i))
-            
-            # If we found matches, return the first one
-            if possible_matches:
-                return answers[possible_matches[0][1]]
-        
-        # Return fallback if no good match
+        # No good matches found, return fallback
         return self.get_fallback()
     
     def get_conversation_history(self, conversation_id, limit=10):
         """Get conversation history"""
         session = self.Session()
         try:
-            # Get messages for conversation
+            # Get messages
             messages = session.query(Message).filter(
                 Message.conversation_id == conversation_id
-            ).order_by(Message.timestamp.desc()).limit(limit).all()
+            ).order_by(Message.timestamp).all()
             
             # Convert to list of dictionaries
-            history = []
-            for message in reversed(messages):  # Reverse to get chronological order
-                history.append({
-                    'id': message.id,
-                    'is_user': message.is_user,
-                    'content': message.content,
-                    'timestamp': message.timestamp.isoformat()
+            result = []
+            for msg in messages:
+                result.append({
+                    "id": msg.id,
+                    "is_user": msg.is_user,
+                    "content": msg.content,
+                    "timestamp": msg.timestamp.isoformat()
                 })
             
-            return history
+            return result
         finally:
             session.close()
 

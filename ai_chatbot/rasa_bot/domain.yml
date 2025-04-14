@@ -1,0 +1,110 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - thank
+  - affirm
+  - deny
+  - ask_order_status
+  - ask_return_policy
+  - ask_shipping_info
+  - ask_payment_methods
+  - ask_product_info
+  - ask_help
+  - out_of_scope
+
+entities:
+  - order_id
+  - product_name
+  - company
+
+slots:
+  order_id:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: order_id
+  product_name:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: product_name
+  company:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: company
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I help you today?"
+    - text: "Hi there! What can I assist you with?"
+    - text: "Welcome! How may I help you?"
+    - text: "Greetings! What do you need help with today?"
+
+  utter_goodbye:
+    - text: "Goodbye! Have a great day!"
+    - text: "Bye! Feel free to reach out if you have more questions."
+    - text: "See you later! Thanks for chatting."
+
+  utter_thank:
+    - text: "You're welcome! Is there anything else I can help with?"
+    - text: "My pleasure! Anything else you'd like to know?"
+    - text: "Happy to help! Let me know if you need anything else."
+
+  utter_affirm:
+    - text: "Great! Let's proceed."
+    - text: "Perfect! I'll help you with that."
+
+  utter_deny:
+    - text: "No problem! Is there something else I can help with?"
+    - text: "I understand. What would you like to do instead?"
+
+  utter_ask_order_status:
+    - text: "I'll check the status of your order. Could you provide your order ID?"
+    - text: "To look up your order status, I'll need your order number."
+
+  utter_provide_order_status:
+    - text: "Your order {order_id} is currently {status}. It's expected to arrive by {delivery_date}."
+    - text: "I found your order {order_id}. It's {status} and should be delivered by {delivery_date}."
+
+  utter_ask_return_policy:
+    - text: "Our return policy allows returns within 30 days of purchase. Would you like more details about the return process?"
+    - text: "You can return items within 30 days of receiving your order. I can provide step-by-step instructions if you'd like."
+
+  utter_ask_shipping_info:
+    - text: "We offer standard shipping (3-5 business days), expedited shipping (2-3 business days), and overnight shipping. Shipping costs vary based on location and order size."
+    - text: "Shipping typically takes 3-5 business days for standard delivery. We also offer faster options. Would you like information about shipping costs?"
+
+  utter_ask_payment_methods:
+    - text: "We accept all major credit cards (Visa, Mastercard, American Express), PayPal, and Apple Pay."
+    - text: "You can pay using credit cards, PayPal, Apple Pay, or Google Pay on our website."
+
+  utter_ask_product_info:
+    - text: "I'd be happy to tell you about {product_name}. What specific information are you looking for?"
+    - text: "Let me get you information about {product_name}. Are you interested in features, specifications, or price?"
+
+  utter_ask_help:
+    - text: "I can help with questions about orders, shipping, returns, payment methods, and product information. What do you need assistance with?"
+    - text: "I'm here to help! I can answer questions about your order, our policies, or our products. What would you like to know?"
+
+  utter_out_of_scope:
+    - text: "I'm sorry, I don't have information about that topic. I can help with questions about orders, shipping, returns, and using our website."
+    - text: "That's outside my area of expertise. I can assist with orders, returns, shipping, and account questions. How can I help you with one of those?"
+    - text: "I'm not able to provide information on that topic. Would you like help with something related to our store, like placing an order or tracking a package?"
+
+  utter_default:
+    - text: "I'm sorry, I didn't understand that. Could you please rephrase?"
+    - text: "I'm not sure I follow. Can you try asking your question differently?"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+
+actions:
+  - action_query_database
+  - action_handle_order_status 

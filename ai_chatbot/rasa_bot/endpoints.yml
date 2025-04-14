@@ -1,0 +1,11 @@
+# Configuration for Rasa endpoints
+
+# Rasa Action Server
+action_endpoint:
+  url: "http://localhost:5055/webhook"
+
+# Tracker Store
+tracker_store:
+  type: SQLTrackerStore
+  dialect: "sqlite"
+  url: "sqlite:///./rasa_trackers.db" 
