@@ -83,6 +83,41 @@ data/scraped/
 # Streamlit
 .streamlit/
 
-# Rasa model directories
+# Rasa specific
 models/rasa/
-models/*/models/ 
+models/*/models/
+ai_chatbot/rasa_bot/.rasa/
+ai_chatbot/rasa_bot/models/
+rasa_bot/.rasa/
+rasa_bot/models/
+.rasa/
+events.db
+story_graph.dot
+story_graph.html
+
+# Transformer models - avoid committing large model files
+*.bin
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.model
+*.joblib
+*.pickle
+*.pkl
+
+# OS specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Node modules (if using JavaScript/frontend)
+node_modules/ 

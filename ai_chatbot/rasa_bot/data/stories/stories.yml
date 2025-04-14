@@ -27,7 +27,13 @@ stories:
   steps:
   - intent: ask_order_status
   - action: utter_ask_order_status
-  - intent: affirm
+  - action: action_handle_order_status
+
+- story: order status with ID provided
+  steps:
+  - intent: ask_order_status
+  - action: utter_ask_order_status
+  - intent: inform
   - action: action_handle_order_status
 
 - story: return policy inquiry

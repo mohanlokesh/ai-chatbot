@@ -13,6 +13,7 @@ intents:
   - ask_product_info
   - ask_help
   - out_of_scope
+  - inform
 
 entities:
   - order_id

@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Boolean, Float, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Boolean, Float, create_engine, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import os
+import enum
 
 Base = declarative_base()
 
@@ -19,6 +20,7 @@ class User(Base):
     
     # Relationships
     conversations = relationship("Conversation", back_populates="user")
+    orders = relationship("Order", back_populates="user")
     
     def __repr__(self):
         return f"<User(username='{self.username}', email='{self.email}')>"
@@ -85,4 +87,48 @@ class SupportData(Base):
     company = relationship("Company", back_populates="support_data")
     
     def __repr__(self):
-        return f"<SupportData(id={self.id}, company_id={self.company_id})>" 
+        return f"<SupportData(id={self.id}, company_id={self.company_id})>"
+
+class OrderStatus(enum.Enum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+    BACKORDERED = "backordered"
+
+class Order(Base):
+    __tablename__ = 'orders'
+    
+    id = Column(Integer, primary_key=True)
+    order_number = Column(String(20), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    total_amount = Column(Float, nullable=False)
+    status = Column(Enum(OrderStatus), default=OrderStatus.PENDING)
+    ordered_at = Column(DateTime, default=datetime.now)
+    estimated_delivery = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, nullable=True)
+    shipping_address = Column(Text, nullable=True)
+    tracking_number = Column(String(50), nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="orders")
+    order_items = relationship("OrderItem", back_populates="order")
+    
+    def __repr__(self):
+        return f"<Order(order_number='{self.order_number}', status={self.status})>"
+
+class OrderItem(Base):
+    __tablename__ = 'order_items'
+    
+    id = Column(Integer, primary_key=True)
+    order_id = Column(Integer, ForeignKey('orders.id'))
+    product_name = Column(String(100), nullable=False)
+    quantity = Column(Integer, default=1)
+    price = Column(Float, nullable=False)
+    
+    # Relationships
+    order = relationship("Order", back_populates="order_items")
+    
+    def __repr__(self):
+        return f"<OrderItem(product='{self.product_name}', quantity={self.quantity})>" 

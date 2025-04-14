@@ -86,6 +86,21 @@ nlu:
     - Is order [ABC123](order_id) shipped yet?
     - Can you tell me where order [ZXY987](order_id) is?
 
+- intent: inform
+  examples: |
+    - [ORD-12345](order_id)
+    - My order number is [ORD-98765](order_id)
+    - It's [ORD-54321](order_id)
+    - The order ID is [ORD-13579](order_id)
+    - Order [ORD-24680](order_id)
+    - [12345](order_id)
+    - [98765](order_id)
+    - [54321](order_id)
+    - Order number [12345](order_id)
+    - It is [ORD-11111](order_id)
+    - My order is [ORD-22222](order_id)
+    - Order id [ORD-33333](order_id)
+
 - intent: ask_return_policy
   examples: |
     - What's your return policy?
